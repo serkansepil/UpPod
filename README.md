@@ -2,6 +2,17 @@
 
 UpPod is a macOS menu bar app that uses compatible AirPods headphone motion data to track head tilt, estimate neck posture strain, and guide short neck exercise sessions. Calibration, posture summaries, and exercise summaries are stored locally on the Mac.
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/uppod.png" alt="UpPod posture popover" width="280">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/exercises-1.png" alt="Neck exercises overview" width="360">
+  <img src="docs/screenshots/exercises-2.png" alt="Guided neck exercise session" width="360">
+</p>
+
 ## Requirements
 
 - macOS 14 or newer
