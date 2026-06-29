@@ -256,6 +256,7 @@ private struct StatusNotice: View {
 struct PopoverContentView: View {
     @ObservedObject var engine: PostureEngine
     var onStartExercise: () -> Void = {}
+    var onCheckForUpdates: () -> Void = {}
     @State private var showStats = false
 
     var body: some View {
@@ -498,6 +499,10 @@ struct PopoverContentView: View {
                     .disabled(!engine.connected)
                 }
                 Spacer()
+                Button(L10n.text("Güncelle", "Update")) { onCheckForUpdates() }
+                    .buttonStyle(.plain)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.secondary)
                 Button(L10n.text("Çıkış", "Quit")) { NSApp.terminate(nil) }
                     .buttonStyle(.plain)
                     .font(.system(size: 13, weight: .semibold))

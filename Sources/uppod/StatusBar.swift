@@ -59,7 +59,7 @@ final class StatusBarController {
     private let popover = NSPopover()
     private let engine: PostureEngine
 
-    init(engine: PostureEngine, onStartExercise: @escaping () -> Void) {
+    init(engine: PostureEngine, onStartExercise: @escaping () -> Void, onCheckForUpdates: @escaping () -> Void) {
         self.engine = engine
         item = NSStatusBar.system.statusItem(withLength: 24)
 
@@ -73,7 +73,11 @@ final class StatusBarController {
         }
 
         popover.behavior = .transient
-        let hosting = NSHostingController(rootView: PopoverContentView(engine: engine, onStartExercise: onStartExercise))
+        let hosting = NSHostingController(rootView: PopoverContentView(
+            engine: engine,
+            onStartExercise: onStartExercise,
+            onCheckForUpdates: onCheckForUpdates
+        ))
         hosting.sizingOptions = .preferredContentSize   // exact size from the SwiftUI content → no top clipping
         hosting.view.wantsLayer = true
         hosting.view.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor

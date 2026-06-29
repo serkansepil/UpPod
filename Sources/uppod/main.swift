@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBar: StatusBarController!
     var exerciseEngine: ExerciseEngine!
     var exerciseWindow: ExerciseWindowController!
+    var updater: AppUpdater!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let useMock = RuntimeFlags.enabled("UPPOD_MOCK")
@@ -18,8 +19,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         engine = PostureEngine(service: service, store: store)
         exerciseEngine = ExerciseEngine(posture: engine)
         exerciseWindow = ExerciseWindowController(engine: exerciseEngine)
+        updater = AppUpdater()
         statusBar = StatusBarController(engine: engine,
-                                        onStartExercise: { [weak self] in self?.exerciseWindow.present() })
+                                        onStartExercise: { [weak self] in self?.exerciseWindow.present() },
+                                        onCheckForUpdates: { [weak self] in self?.updater.checkForUpdates() })
         engine.start()
 
         if RuntimeFlags.enabled("UPPOD_EX_AUTOSTART") {

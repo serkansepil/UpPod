@@ -22,14 +22,20 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleVersion</key>
-    <string>2</string>
+    <string>3</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.1.1</string>
+    <string>0.1.2</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSMotionUsageDescription</key>
     <string>UpPod uses AirPods motion data to measure head tilt and guide neck posture. Your posture data stays on your Mac.</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUFeedURL</key>
+    <string>https://serkansepil.github.io/UpPod/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>HK4/n/M0vXZqK3zcfz/jO0EJpijcqS8vdPffkRg515Q=</string>
 </dict>
 </plist>

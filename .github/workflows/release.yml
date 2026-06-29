@@ -18,6 +18,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  pages: write
 
 concurrency:
   group: release-${{ github.ref }}
@@ -27,6 +29,9 @@ jobs:
   release:
     name: Build, notarize, and publish
     runs-on: macos-14
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     env:
       APP_NAME: UpPod.app
@@ -83,6 +88,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           : "${APPLE_CERTIFICATE_BASE64:?Missing APPLE_CERTIFICATE_BASE64 repository secret}"
@@ -91,6 +97,7 @@ jobs:
           : "${APPLE_ID:?Missing APPLE_ID repository secret}"
           : "${APPLE_APP_PASSWORD:?Missing APPLE_APP_PASSWORD repository secret}"
           : "${APPLE_TEAM_ID:?Missing APPLE_TEAM_ID repository secret}"
+          : "${SPARKLE_PRIVATE_KEY:?Missing SPARKLE_PRIVATE_KEY repository secret}"
 
       - name: Configure signing and notarization
         env:
@@ -192,6 +199,39 @@ jobs:
               --target "$GITHUB_SHA" \
               $PRERELEASE_ARG
           fi
+
+      - name: Generate Sparkle appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          APPCAST_URL="https://serkansepil.github.io/UpPod/appcast.xml"
+          DOWNLOAD_PREFIX="https://github.com/${GITHUB_REPOSITORY}/releases/download/${VERSION}/"
+          SPARKLE_BIN=".build/artifacts/sparkle/Sparkle/bin"
+
+          mkdir -p appcast-source pages
+          curl -fsSL "$APPCAST_URL" -o appcast-source/appcast.xml || true
+          cp "$APP_ZIP" appcast-source/uppod.zip
+          cp release-notes.md appcast-source/uppod.md
+
+          printf '%s\n' "$SPARKLE_PRIVATE_KEY" | \
+            "$SPARKLE_BIN/generate_appcast" \
+              --ed-key-file - \
+              --download-url-prefix "$DOWNLOAD_PREFIX" \
+              --link "https://github.com/${GITHUB_REPOSITORY}" \
+              --embed-release-notes \
+              appcast-source
+
+          cp appcast-source/appcast.xml pages/appcast.xml
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages
+
+      - name: Deploy appcast to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
       - name: Clean up signing keychain
         if: always()

@@ -10,13 +10,19 @@ SIGN_IDENTITY="${UPPOD_SIGN_IDENTITY:--}"
 echo "→ swift build (release)"
 swift build -c release
 
-BIN="$(swift build -c release --show-bin-path)/uppod"
+BIN_DIR="$(swift build -c release --show-bin-path)"
+BIN="$BIN_DIR/uppod"
+SPARKLE_FRAMEWORK="$BIN_DIR/Sparkle.framework"
 
 echo "→ .app bundle"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Frameworks" "$APP/Contents/Resources"
 cp Info.plist "$APP/Contents/Info.plist"
 cp "$BIN" "$APP/Contents/MacOS/uppod"
+ditto "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
+if ! otool -l "$APP/Contents/MacOS/uppod" | grep -q '@executable_path/../Frameworks'; then
+  install_name_tool -add_rpath '@executable_path/../Frameworks' "$APP/Contents/MacOS/uppod"
+fi
 cp Sources/uppod/Assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp Sources/uppod/Assets/coach-flexion.png "$APP/Contents/Resources/coach-flexion.png"
 cp Sources/uppod/Assets/coach-roll.png "$APP/Contents/Resources/coach-roll.png"
@@ -30,11 +36,14 @@ cp Resources/tr.lproj/InfoPlist.strings "$APP/Contents/Resources/tr.lproj/InfoPl
 
 if [[ "$SIGN_IDENTITY" == "-" ]]; then
   echo "→ ad-hoc signing"
+  codesign --force --deep --sign - "$APP/Contents/Frameworks/Sparkle.framework"
   codesign --force --sign - --identifier "$BUNDLE_ID" "$APP"
 else
   echo "→ Developer ID signing"
+  codesign --force --deep --sign "$SIGN_IDENTITY" --options runtime --timestamp "$APP/Contents/Frameworks/Sparkle.framework"
   codesign --force --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" --options runtime --timestamp "$APP"
 fi
+codesign --verify --deep --strict --verbose=2 "$APP"
 
 if [[ "${UPPOD_NOTARIZE:-0}" == "1" ]]; then
   echo "→ notarization zip"
@@ -57,6 +66,9 @@ if [[ "${UPPOD_NOTARIZE:-0}" == "1" ]]; then
   fi
   echo "→ staple ticket"
   xcrun stapler staple "$APP"
+  echo "→ final stapled zip"
+  rm -f "$ZIP"
+  ditto -c -k --keepParent "$APP" "$ZIP"
 fi
 
 echo "✓ $APP"

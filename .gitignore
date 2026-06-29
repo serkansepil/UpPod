@@ -4,7 +4,6 @@
 # SwiftPM
 .build/
 .swiftpm/
-Package.resolved
 
 # App bundles
 *.app/

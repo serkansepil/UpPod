@@ -2,6 +2,17 @@
 
 UpPod is a macOS menu bar app that uses compatible AirPods headphone motion data to track head tilt, estimate neck posture strain, and guide short neck exercise sessions. Calibration, posture summaries, and exercise summaries are stored locally on the Mac.
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/uppod.png" alt="UpPod posture popover" width="280">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/exercises-1.png" alt="Neck exercises overview" width="360">
+  <img src="docs/screenshots/exercises-2.png" alt="Guided neck exercise session" width="360">
+</p>
+
 ## Requirements
 
 - macOS 14 or newer
@@ -90,7 +101,7 @@ UPPOD_NOTARY_PROFILE=uppod-ecma \
 The repository includes two GitHub Actions workflows:
 
 - `.github/workflows/ci.yml`: runs `swift test` on pushes to `main`, pull requests, and manual dispatch.
-- `.github/workflows/release.yml`: builds, signs, notarizes, packages, and publishes a GitHub Release.
+- `.github/workflows/release.yml`: builds, signs, notarizes, packages, publishes a GitHub Release, and updates the Sparkle appcast.
 
 Automatic releases are triggered by pushing a version tag:
 
@@ -109,6 +120,7 @@ Release signing and notarization require these repository secrets:
 - `APPLE_ID`: Apple ID email used for notarization.
 - `APPLE_APP_PASSWORD`: app-specific password for notarization.
 - `APPLE_TEAM_ID`: Apple Developer Team ID.
+- `SPARKLE_PRIVATE_KEY`: Sparkle EdDSA private key used to sign appcast updates.
 
 To encode the certificate on macOS:
 
@@ -116,7 +128,17 @@ To encode the certificate on macOS:
 base64 -i DeveloperIDApplication.p12 | pbcopy
 ```
 
-The release uploads both `uppod.dmg` and `uppod.zip`, and writes SHA-256 checksums into the GitHub Release notes.
+The release uploads both `uppod.dmg` and `uppod.zip`, writes SHA-256 checksums into the GitHub Release notes, and deploys `appcast.xml` to GitHub Pages.
+
+## Updates
+
+UpPod uses Sparkle 2 for app updates.
+
+- Feed URL: `https://serkansepil.github.io/UpPod/appcast.xml`
+- Public EdDSA key: stored in `Info.plist` as `SUPublicEDKey`.
+- Private EdDSA key: stored only as the `SPARKLE_PRIVATE_KEY` GitHub Actions secret.
+
+The first Sparkle-enabled build must still be installed manually. Later releases can be discovered through Sparkle's automatic checks or the popover's update button.
 
 ## Debug Builds
 
