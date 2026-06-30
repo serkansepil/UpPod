@@ -56,7 +56,7 @@ enum ExerciseLibrary {
         id: "roll", name: "Yan esneme",
         instruction: "Sol ve sağ omzuna doğru yavaşça eğil.",
         axis: .roll,
-        goal: .reps(target: 15, perDirection: 5, bidirectional: true),
+        goal: .reps(target: 30, perDirection: 5, bidirectional: true),
         neutralBand: 6, hysteresis: 3, restSeconds: 10)
 
     static let chinTuck = Exercise(
@@ -70,7 +70,7 @@ enum ExerciseLibrary {
         id: "yaw", name: "Sağa sola bak",
         instruction: "Omuzunun üzerinden bakacak kadar yavaşça dön.",
         axis: .yaw,
-        goal: .reps(target: 35, perDirection: 5, bidirectional: true),
+        goal: .reps(target: 45, perDirection: 5, bidirectional: true),
         neutralBand: 10, hysteresis: 5, restSeconds: 10)
 
     static let all: [Exercise] = [flexionExtension, sideTilt, chinTuck, rotation]
@@ -81,13 +81,13 @@ enum ExerciseLibrary {
                  axis: .flexion, goal: .reps(target: 20, perDirection: 1, bidirectional: true),
                  neutralBand: 8, hysteresis: 4, restSeconds: 2),
         Exercise(id: "roll", name: "Side tilt", instruction: "test",
-                 axis: .roll, goal: .reps(target: 15, perDirection: 1, bidirectional: true),
+                 axis: .roll, goal: .reps(target: 30, perDirection: 1, bidirectional: true),
                  neutralBand: 6, hysteresis: 3, restSeconds: 2),
         Exercise(id: "chintuck", name: "Chin tuck", instruction: "test",
                  axis: .chinTuck, goal: .guidedHold(seconds: 2, count: 1),
                  neutralBand: 0, hysteresis: 0, restSeconds: 2),
         Exercise(id: "yaw", name: "Look left & right", instruction: "test",
-                 axis: .yaw, goal: .reps(target: 35, perDirection: 1, bidirectional: true),
+                 axis: .yaw, goal: .reps(target: 45, perDirection: 1, bidirectional: true),
                  neutralBand: 10, hysteresis: 5, restSeconds: 2),
     ]
 }

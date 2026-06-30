@@ -110,7 +110,7 @@ final class MockMotionService: MotionProviding {
             guard let self else { return }
             self.phase += 0.02
             let phi = sin(self.phase * 0.25) * 0.6                       // pitch ~±34°
-            let rho = sin(self.phase * 0.17) * (self.exMode ? 0.45 : 0.15)  // roll ±26° (ex) / ±8.6°
+            let rho = sin(self.phase * 0.17) * (self.exMode ? 0.60 : 0.15)  // roll ±34° (ex) / ±8.6°
             let yaw = self.exMode ? sin(self.phase * 0.3) * 0.9 : 0.0    // yaw ±51° (ex) / 0
             let rot = self.exMode && abs(sin(self.phase * 0.7)) > 0.985 ? 0.5 : 0.02  // occasional peak
             // rotate the up vector by pitch(x axis) then roll(y axis) → consistent gravity
